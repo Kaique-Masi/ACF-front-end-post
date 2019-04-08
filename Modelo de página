@@ -1,0 +1,71 @@
+<?php
+/*
+Template Name: NOME DO TEMPLATE
+*/
+if ( is_user_logged_in() || current_user_can('publish_posts') ) { // Execute code if user is logged in
+    acf_form_head();
+    wp_deregister_style( 'wp-admin' );
+}
+get_header();
+
+							 the_content(); ?>
+
+<div class="container">
+    <div class="container_inner default_template_holder clearfix page_container_inner">							 
+<?php 							 // Trocar o nome do título do post
+function change_title_label( $field ) {
+    $field['label'] = 'NOME AQUI';
+    return $field;
+}
+add_filter('acf/load_field/name=_post_title', 'change_title_label');?>
+
+<?php // Trocar o nome do editor de conteúdo 
+function change_content_label( $field ) {
+    $field['label'] = 'NOME AQUI';
+    return $field;
+}
+add_filter('acf/load_field/name=_post_content', 'change_content_label');?>
+
+<?php // Deixar o conteúdo do post como obrigatório
+function change_post_content_required( $field ) {
+    $field['required'] = true;
+    return $field;
+}
+add_filter('acf/load_field/name=_post_content', 'change_post_content_required');?>
+
+<?php // Change Post Content Type
+add_filter( 'acf/get_valid_field', 'change_post_content_type');
+function change_post_content_type( $field ) { 
+    if($field['type'] == 'wysiwyg') {
+        $field['tabs'] = 'visual';
+        $field['toolbar'] = 'basic';
+        $field['media_upload'] = 0;
+    }
+    return $field;
+}?>
+
+
+							<?php
+if ( ! ( is_user_logged_in() || current_user_can('publish_posts') ) ) {
+    echo '<p>You must be a registered author to post.</p>';
+} else {
+     acf_form(array(
+         'post_id' => 'new_post',
+         'field_groups' => array(331), // Coloque aqui o ID do seu grupo de campos do ACF... Você encontra esse número na url.
+         'post_title' => true, // Mostrar o campo de título do post no front end
+         'post_content' => true, // Mostrar o campo de conteúdo do post no front end
+         'form' => true,
+         'new_post' => array(
+             'post_type' => 'produto', //Nome do seu post type que vai ser criado no front end
+             'post_status' => 'pending' // Aqui você determina se a pessoa vai publicar, deixar pendente de aprovação, como rascunho, etc.
+         ),
+         'return' => '%post_url%',
+         'submit_value' => 'NOME AQUI', // Nome do Botão de publicar o post. 
+     ));
+}
+?>
+<br />
+    </div>
+</div>
+		
+	<?php get_footer(); ?>
